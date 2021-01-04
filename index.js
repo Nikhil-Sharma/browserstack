@@ -27,8 +27,23 @@ var driver = new webdriver.Builder().
   withCapabilities(capabilities).
   build();
 
-async function example() {
-    await driver.get("http://google.com");
-    await driver.findElement(By.name("q")).sendKeys("Jenkins",Key.RETURN);
-}
-example();
+// async function example() {
+//     await driver.get("http://google.com");
+//     await driver.findElement(By.name("q")).sendKeys("Jenkins",Key.RETURN);
+// }
+// example();
+
+driver.get('https://www.google.com').then(function(){
+  driver.findElement(webdriver.By.name('q')).sendKeys('BrowserStack').then(function(){
+    driver.getTitle().then(function(title) {
+      console.log(title);
+      // Setting the status of test as 'passed' or 'failed' based on the condition; if title of the web page included 'BrowserStack'
+      if(title.includes('BrowserStack')) {
+      	driver.executeScript('browserstack_executor: {"action": "setSessionStatus", "arguments": {"status":"passed","reason": "Title contains BrowserStack!"}}');
+      } else {
+      	driver.executeScript('browserstack_executor: {"action": "setSessionStatus", "arguments": {"status":"failed","reason": "Title does not contain BrowserStack!"}}');
+      }
+      driver.quit();
+    });
+  });
+}); 
