@@ -1,49 +1,8 @@
-var webdriver = require('selenium-webdriver');
 const{Builder, By, Key, util} = require('selenium-webdriver');
-
-var username = process.env.BROWSERSTACK_USERNAME;
-var accessKey = process.env.BROWSERSTACK_ACCESS_KEY;
-var buildName = process.env.BROWSERSTACK_BUILD_NAME;
-var browserstackLocal = process.env.BROWSERSTACK_LOCAL;
-var browserstackLocalIdentifier = process.env.BROWSERSTACK_LOCAL_IDENTIFIER;
-
-// Input capabilities
-var capabilities = {
- 'os_version' : '10',
- 'resolution' : '1920x1080',
- 'browserName' : 'Chrome',
- 'browser_version' : 'latest',
- 'os' : 'Windows',
- 'name': 'test Jenkins', // test name
- "build" : buildName, // CI/CD job name using BROWSERSTACK_BUILD_NAME env variable
- "browserstack.local" : browserstackLocal,
- "browserstack.localIdentifier" : browserstackLocalIdentifier,
- "browserstack.user" : username,
- "browserstack.key" : accessKey
+const { SeleniumServer } = require('selenium-webdriver/remote');
+async function example() {
+    let driver = await new Builder().forBrowser('firefox').build();
+    await driver.get("http://google.com");
+    await driver.findElement(By.name("q")).sendKeys("looks like friday",Key.RETURN);
 }
-
-var driver = new webdriver.Builder().
-  usingServer("https://hub-cloud.browserstack.com/wd/hub").
-  withCapabilities(capabilities).
-  build();
-
-// async function example() {
-//     await driver.get("http://google.com");
-//     await driver.findElement(By.name("q")).sendKeys("Jenkins",Key.RETURN);
-// }
-// example();
-
-driver.get('https://www.google.com').then(function(){
-  driver.findElement(webdriver.By.name('q')).sendKeys('BrowserStack').then(function(){
-    driver.getTitle().then(function(title) {
-      console.log(title);
-      // Setting the status of test as 'passed' or 'failed' based on the condition; if title of the web page included 'BrowserStack'
-      if(title.includes('BrowserStack')) {
-      	driver.executeScript('browserstack_executor: {"action": "setSessionStatus", "arguments": {"status":"passed","reason": "Title contains BrowserStack!"}}');
-      } else {
-      	driver.executeScript('browserstack_executor: {"action": "setSessionStatus", "arguments": {"status":"failed","reason": "Title does not contain BrowserStack!"}}');
-      }
-      driver.quit();
-    });
-  });
-}); 
+example();
